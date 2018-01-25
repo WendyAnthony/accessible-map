@@ -33,8 +33,12 @@ class ViewController: UIViewController {
             }
             
             if weakSelf.mapView.isNavigating == false {
-                let currentViewpoint = weakSelf.mapView.currentViewpoint(with: AGSViewpointType.centerAndScale)
-                let zoomLevel = weakSelf.getZoomLevel(of: currentViewpoint!.targetScale)
+                guard let currentViewpoint = weakSelf.mapView.currentViewpoint(with: AGSViewpointType.centerAndScale),
+                    !currentViewpoint.targetScale.isNaN else {
+                    //no viewpoint/targetScale yet
+                    return
+                }
+                let zoomLevel = weakSelf.getZoomLevel(of: currentViewpoint.targetScale)
                 UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "Zoom \(zoomLevel)")
             }
         }
