@@ -13,6 +13,7 @@
 		12863CB0201A383C0027FF7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 12863CAF201A383C0027FF7E /* Assets.xcassets */; };
 		12863CB3201A383C0027FF7E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12863CB1201A383C0027FF7E /* LaunchScreen.storyboard */; };
 		12863CBB201A42A90027FF7E /* ArcGIS.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 12863CBA201A42A90027FF7E /* ArcGIS.bundle */; };
+		E4C755A4201A7DA700C90886 /* ZoomInOut.png in Resources */ = {isa = PBXBuildFile; fileRef = E4C755A3201A7DA600C90886 /* ZoomInOut.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		12863CB2201A383C0027FF7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		12863CB4201A383C0027FF7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		12863CBA201A42A90027FF7E /* ArcGIS.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ArcGIS.bundle; sourceTree = "<group>"; };
+		E4C755A3201A7DA600C90886 /* ZoomInOut.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ZoomInOut.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				12863CAF201A383C0027FF7E /* Assets.xcassets */,
 				12863CB1201A383C0027FF7E /* LaunchScreen.storyboard */,
 				12863CB4201A383C0027FF7E /* Info.plist */,
+				E4C755A3201A7DA600C90886 /* ZoomInOut.png */,
 			);
 			path = AccessibleMap;
 			sourceTree = "<group>";
@@ -128,6 +131,7 @@
 			files = (
 				12863CB3201A383C0027FF7E /* LaunchScreen.storyboard in Resources */,
 				12863CB0201A383C0027FF7E /* Assets.xcassets in Resources */,
+				E4C755A4201A7DA700C90886 /* ZoomInOut.png in Resources */,
 				12863CBB201A42A90027FF7E /* ArcGIS.bundle in Resources */,
 				12863CAE201A383C0027FF7E /* Main.storyboard in Resources */,
 			);
