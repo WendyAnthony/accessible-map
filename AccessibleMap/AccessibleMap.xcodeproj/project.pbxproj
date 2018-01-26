@@ -13,7 +13,9 @@
 		12863CB0201A383C0027FF7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 12863CAF201A383C0027FF7E /* Assets.xcassets */; };
 		12863CB3201A383C0027FF7E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12863CB1201A383C0027FF7E /* LaunchScreen.storyboard */; };
 		12863CBB201A42A90027FF7E /* ArcGIS.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 12863CBA201A42A90027FF7E /* ArcGIS.bundle */; };
-		E4C755A4201A7DA700C90886 /* ZoomInOut.png in Resources */ = {isa = PBXBuildFile; fileRef = E4C755A3201A7DA600C90886 /* ZoomInOut.png */; };
+		12E3CDCF201AA3BB00360105 /* Location.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 12E3CDCE201AA3BB00360105 /* Location.gpx */; };
+		12E3CDD2201AA3C200360105 /* food_plate.png in Resources */ = {isa = PBXBuildFile; fileRef = 12E3CDD1201AA3C200360105 /* food_plate.png */; };
+		12E3CDD4201AA3F300360105 /* ZoomInOut.png in Resources */ = {isa = PBXBuildFile; fileRef = 12E3CDD3201AA3F300360105 /* ZoomInOut.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +27,10 @@
 		12863CB2201A383C0027FF7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		12863CB4201A383C0027FF7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		12863CBA201A42A90027FF7E /* ArcGIS.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ArcGIS.bundle; sourceTree = "<group>"; };
-		E4C755A3201A7DA600C90886 /* ZoomInOut.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ZoomInOut.png; sourceTree = "<group>"; };
+		12E3CDCE201AA3BB00360105 /* Location.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Location.gpx; sourceTree = "<group>"; };
+		12E3CDD1201AA3C200360105 /* food_plate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = food_plate.png; sourceTree = "<group>"; };
+		12E3CDD3201AA3F300360105 /* ZoomInOut.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ZoomInOut.png; sourceTree = "<group>"; };
+		12E3CDD5201AA53B00360105 /* test.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = test.gpx; path = ../../../test.gpx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,15 +64,26 @@
 		12863CA7201A383C0027FF7E /* AccessibleMap */ = {
 			isa = PBXGroup;
 			children = (
+				12E3CDD0201AA3C200360105 /* Images */,
+				12E3CDCE201AA3BB00360105 /* Location.gpx */,
 				12863CA8201A383C0027FF7E /* AppDelegate.swift */,
 				12863CAA201A383C0027FF7E /* ViewController.swift */,
 				12863CAC201A383C0027FF7E /* Main.storyboard */,
 				12863CAF201A383C0027FF7E /* Assets.xcassets */,
 				12863CB1201A383C0027FF7E /* LaunchScreen.storyboard */,
 				12863CB4201A383C0027FF7E /* Info.plist */,
-				E4C755A3201A7DA600C90886 /* ZoomInOut.png */,
+				12E3CDD5201AA53B00360105 /* test.gpx */,
 			);
 			path = AccessibleMap;
+			sourceTree = "<group>";
+		};
+		12E3CDD0201AA3C200360105 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				12E3CDD3201AA3F300360105 /* ZoomInOut.png */,
+				12E3CDD1201AA3C200360105 /* food_plate.png */,
+			);
+			path = Images;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,8 +147,10 @@
 			files = (
 				12863CB3201A383C0027FF7E /* LaunchScreen.storyboard in Resources */,
 				12863CB0201A383C0027FF7E /* Assets.xcassets in Resources */,
-				E4C755A4201A7DA700C90886 /* ZoomInOut.png in Resources */,
 				12863CBB201A42A90027FF7E /* ArcGIS.bundle in Resources */,
+				12E3CDD2201AA3C200360105 /* food_plate.png in Resources */,
+				12E3CDD4201AA3F300360105 /* ZoomInOut.png in Resources */,
+				12E3CDCF201AA3BB00360105 /* Location.gpx in Resources */,
 				12863CAE201A383C0027FF7E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
