@@ -64,6 +64,7 @@ class ViewController: UIViewController, AGSGeoViewTouchDelegate, XMLParserDelega
         }
         
         // get default routing parameters
+        routeTask.credential = AGSCredential(user: "user", password: "password")
         routeTask.load { [weak self] (error) in
             if let error = error {
                 print(error)
@@ -73,8 +74,6 @@ class ViewController: UIViewController, AGSGeoViewTouchDelegate, XMLParserDelega
         
         //add graphicsOverlays to the map view
         mapView.graphicsOverlays.addObjects(from: [routeGraphicsOverlay, stopGraphicsOverlay])
-//        routeGraphicsOverlay.isVisible = true
-//        stopGraphicsOverlay.isVisible = true
 
         map.load { [weak self] (error) in
             guard error == nil else {
@@ -105,6 +104,9 @@ class ViewController: UIViewController, AGSGeoViewTouchDelegate, XMLParserDelega
     }
 
     func startLocationDisplay() {
+        let gpxDataSource = AGSGPXLocationDataSource(name: "Location")
+        mapView.locationDisplay.dataSource = gpxDataSource
+        
         mapView.locationDisplay.autoPanMode = .recenter
         mapView.locationDisplay.showPingAnimationSymbol = true
         
@@ -130,11 +132,11 @@ class ViewController: UIViewController, AGSGeoViewTouchDelegate, XMLParserDelega
         }
         
         print("tapped location: x = \(mapPoint.x), y = \(mapPoint.y)")
-        routeGraphicsOverlay.graphics.removeAllObjects()
-        let startStopGraphic = AGSGraphic(geometry: mapPoint, symbol: self.stopSymbol(withName: "Tapped", textColor: .green), attributes: nil)
-        routeGraphicsOverlay.graphics.add(startStopGraphic)
+//        routeGraphicsOverlay.graphics.removeAllObjects()
+//        let startStopGraphic = AGSGraphic(geometry: mapPoint, symbol: self.stopSymbol(withName: "Tapped", textColor: .green), attributes: nil)
+//        routeGraphicsOverlay.graphics.add(startStopGraphic)
         
-//        route(currentLocation, endLocation: mapPoint)
+        route(currentLocation, endLocation: mapPoint)
     }
     
     // reading data from GPX file: https://stackoverflow.com/questions/38507289/swift-how-to-read-coordinates-from-a-gpx-file
@@ -215,11 +217,11 @@ class ViewController: UIViewController, AGSGeoViewTouchDelegate, XMLParserDelega
             return
         }
         
-        let startStopGraphic = AGSGraphic(geometry: startLocation, symbol: self.stopSymbol(withName: "Origin", textColor: UIColor.blue), attributes: nil)
-        let endStopGraphic = AGSGraphic(geometry: endLocation, symbol: self.stopSymbol(withName: "Destination", textColor: UIColor.red), attributes: nil)
+        let startStopGraphic = AGSGraphic(geometry: startLocation, symbol: stopSymbol(withName: "Origin", textColor: UIColor.blue), attributes: nil)
+        let endStopGraphic = AGSGraphic(geometry: endLocation, symbol: stopSymbol(withName: "Destination", textColor: UIColor.red), attributes: nil)
         
-        self.stopGraphicsOverlay.graphics.addObjects(from: [startStopGraphic, endStopGraphic])
-
+        stopGraphicsOverlay.graphics.removeAllObjects()
+        stopGraphicsOverlay.graphics.addObjects(from: [startStopGraphic, endStopGraphic])
         
         //set parameters to return directions
         parameters.returnDirections = true
