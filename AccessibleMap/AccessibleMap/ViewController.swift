@@ -113,7 +113,7 @@ class ViewController: UIViewController {
     }
     
     func addUserLocation() {
-        let userLocation = AGSPoint(x: -117.182, y: 34.056, spatialReference: AGSSpatialReference.wgs84())
+        let userLocation = AGSPoint(x: -117.182, y: 34.0564, spatialReference: AGSSpatialReference.wgs84())
         let userLocation_webmercator = AGSGeometryEngine.projectGeometry(userLocation, to: AGSSpatialReference.webMercator()) as! AGSPoint
         let symbol = AGSPictureMarkerSymbol(image: UIImage(named: "person_location")!)
         symbol.height = 30.0
@@ -408,6 +408,12 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
                 self?.generatedRoute = route
                 let routeGraphic = AGSGraphic(geometry: route.routeGeometry, symbol: self?.routeSymbol(), attributes: nil)
                 self?.routeGraphicsOverlay.graphics.add(routeGraphic)
+                
+                var directions = "Directions to your destination, "
+                for maneuver in route.directionManeuvers {
+                    directions.append(", " + maneuver.directionText)
+                }
+                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, directions)
             }
         }
     }
@@ -479,7 +485,14 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
         // hide the callout
         mapView.callout.dismiss()
         
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "Navigating you to Tartan Restaurant")
+        var spokenString = "Navigating you to "
+        if let title = callout.title {
+            spokenString.append(title)
+        }
+        if let detail = callout.detail {
+            spokenString.append(detail)
+        }
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, spokenString)
         
         view.accessibilityElements = [mapView, zoomInButton, zoomOutButton, mapView.callout, mapView.callout.subviews]
         
