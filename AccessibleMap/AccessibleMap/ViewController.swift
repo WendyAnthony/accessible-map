@@ -9,14 +9,14 @@
 import UIKit
 import ArcGIS
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, AGSGeoViewTouchDelegate {
 
     @IBOutlet weak var mapView: AGSMapView!
     private var map: AGSMap!
     @IBOutlet var zoomInButton: UIButton!
     @IBOutlet var zoomOutButton: UIButton!
     
-    var routeTask:AGSRouteTask = AGSRouteTask(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/NetworkAnalysis/SanDiego/NAServer/Route")!)
+    var routeTask:AGSRouteTask = AGSRouteTask(url: URL(string: "https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_NorthAmerica")!)
     var routeParameters:AGSRouteParameters?
     var generatedRoute:AGSRoute?
     var stopGraphicsOverlay = AGSGraphicsOverlay()
@@ -24,6 +24,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        mapView.touchDelegate = self
         
         //map = AGSMap(basemap: AGSBasemap.openStreetMap())
         map = AGSMap(basemap: AGSBasemap.streetsVector()) //for styling
@@ -57,8 +59,18 @@ class ViewController: UIViewController {
         // zoom to user location
         startLocationDisplay()
         
+        // get default routing parameters
+        routeTask.load { [weak self] (error) in
+            if let error = error {
+                print(error)
+            }
+            self?.getDefaultParameters()
+        }
+        
         //add graphicsOverlays to the map view
-        self.mapView.graphicsOverlays.addObjects(from: [routeGraphicsOverlay, stopGraphicsOverlay])
+        mapView.graphicsOverlays.addObjects(from: [routeGraphicsOverlay, stopGraphicsOverlay])
+        routeGraphicsOverlay.isVisible = true
+        stopGraphicsOverlay.isVisible = true
 }
 
     func startLocationDisplay() {
@@ -77,6 +89,21 @@ class ViewController: UIViewController {
         // ref. https://community.esri.com/thread/118146
         let zoom = log(591657550.500000 / (mapScale / 2)) / log(2.0)
         return Int(zoom)
+    }
+    
+    // MARK: touch delegate
+    func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
+        guard let currentLocation = mapView.locationDisplay.mapLocation else {
+            print("no current location")
+            return
+        }
+        
+        print("tapped location: x = \(mapPoint.x), y = \(mapPoint.y)")
+        routeGraphicsOverlay.graphics.removeAllObjects()
+        let startStopGraphic = AGSGraphic(geometry: mapPoint, symbol: self.stopSymbol(withName: "Tapped", textColor: .green), attributes: nil)
+        routeGraphicsOverlay.graphics.add(startStopGraphic)
+        
+//        route(currentLocation, endLocation: mapPoint)
     }
     
     // MARK: UI Actions
@@ -117,6 +144,12 @@ class ViewController: UIViewController {
             return
         }
         
+        let startStopGraphic = AGSGraphic(geometry: startLocation, symbol: self.stopSymbol(withName: "Origin", textColor: UIColor.blue), attributes: nil)
+        let endStopGraphic = AGSGraphic(geometry: endLocation, symbol: self.stopSymbol(withName: "Destination", textColor: UIColor.red), attributes: nil)
+        
+        self.stopGraphicsOverlay.graphics.addObjects(from: [startStopGraphic, endStopGraphic])
+
+        
         //set parameters to return directions
         parameters.returnDirections = true
         
@@ -146,6 +179,7 @@ class ViewController: UIViewController {
                     return
                 }
                 
+                print("routed completed, no error")
                 self?.generatedRoute = route
                 let routeGraphic = AGSGraphic(geometry: route.routeGeometry, symbol: self?.routeSymbol(), attributes: nil)
                 self?.routeGraphicsOverlay.graphics.add(routeGraphic)
@@ -170,6 +204,11 @@ class ViewController: UIViewController {
     func routeSymbol() -> AGSSimpleLineSymbol {
         let symbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.yellow, width: 5)
         return symbol
+    }
+    
+    //method provides a text symbol for stop with specified parameters
+    func stopSymbol(withName name:String, textColor:UIColor) -> AGSTextSymbol {
+        return AGSTextSymbol(text: name, color: textColor, size: 20, horizontalAlignment: .center, verticalAlignment: .middle)
     }
 }
 
