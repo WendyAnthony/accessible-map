@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,27 +17,29 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Oed-Eo-gKN" customClass="AGSMapView">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Oed-Eo-gKN" userLabel="Map view" customClass="AGSMapView">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <accessibility key="accessibilityConfiguration" label="Map View">
                                     <bool key="isElement" value="YES"/>
                                 </accessibility>
                             </view>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ZoomInOut.png" translatesAutoresizingMaskIntoConstraints="NO" id="BIR-FO-5Rc">
-                                <rect key="frame" x="8" y="28" width="32" height="63"/>
-                                <color key="backgroundColor" white="0.66666666669999997" alpha="0.5" colorSpace="calibratedWhite"/>
-                            </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j0f-nb-Eic">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j0f-nb-Eic" userLabel="Zoom in">
                                 <rect key="frame" x="8" y="28" width="32" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
                                 <accessibility key="accessibilityConfiguration" label="Zoom In"/>
+                                <state key="normal" backgroundImage="zoom_in.png"/>
                                 <connections>
                                     <action selector="zoomIn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="0S7-oG-ATv"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6dP-kv-GiS">
-                                <rect key="frame" x="8" y="61" width="32" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6dP-kv-GiS" userLabel="Zoom out">
+                                <rect key="frame" x="8" y="59" width="32" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
                                 <accessibility key="accessibilityConfiguration" label="Zoom Out"/>
+                                <state key="normal" backgroundImage="zoom_out.png"/>
                                 <connections>
                                     <action selector="zoomOut:" destination="BYZ-38-t0r" eventType="touchUpInside" id="fS0-Nh-KKW"/>
                                 </connections>
@@ -48,15 +50,7 @@
                             <constraint firstItem="Oed-Eo-gKN" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="30f-yy-DGC"/>
                             <constraint firstItem="Oed-Eo-gKN" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="3e2-au-eq1"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Oed-Eo-gKN" secondAttribute="trailing" id="47D-0B-rPs"/>
-                            <constraint firstItem="j0f-nb-Eic" firstAttribute="trailing" secondItem="BIR-FO-5Rc" secondAttribute="trailing" id="9e8-oO-E53"/>
-                            <constraint firstItem="BIR-FO-5Rc" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="BAo-yC-PPQ"/>
-                            <constraint firstItem="6dP-kv-GiS" firstAttribute="trailing" secondItem="BIR-FO-5Rc" secondAttribute="trailing" id="JjC-O5-4te"/>
                             <constraint firstAttribute="bottom" secondItem="Oed-Eo-gKN" secondAttribute="bottom" id="QTb-bW-quM"/>
-                            <constraint firstItem="j0f-nb-Eic" firstAttribute="leading" secondItem="BIR-FO-5Rc" secondAttribute="leading" id="ToB-C4-1q5"/>
-                            <constraint firstItem="6dP-kv-GiS" firstAttribute="bottom" secondItem="BIR-FO-5Rc" secondAttribute="bottom" id="Xdi-yR-qaY"/>
-                            <constraint firstItem="BIR-FO-5Rc" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="iLN-FA-Ic6"/>
-                            <constraint firstItem="6dP-kv-GiS" firstAttribute="leading" secondItem="BIR-FO-5Rc" secondAttribute="leading" id="id6-bJ-Qb6"/>
-                            <constraint firstItem="j0f-nb-Eic" firstAttribute="top" secondItem="BIR-FO-5Rc" secondAttribute="top" id="sZB-lt-0vv"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
@@ -72,6 +66,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="ZoomInOut.png" width="32" height="63"/>
+        <image name="zoom_in.png" width="50" height="50"/>
+        <image name="zoom_out.png" width="50" height="50"/>
     </resources>
 </document>
