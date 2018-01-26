@@ -37,16 +37,10 @@ class ViewController: UIViewController {
     
     private let POINTS_FEATURE_SERVICE_URL = URL(string: "http://services.arcgis.com/Wl7Y1m92PbjtJs5n/ArcGIS/rest/services/Downtown_Redlands/FeatureServer/1")!
     private let NATURAL_AREA_FEATURE_SERVICE_URL = URL(string: "http://services.arcgis.com/Wl7Y1m92PbjtJs5n/ArcGIS/rest/services/Downtown_Redlands/FeatureServer/7")!
-    private let GPX_FILE_NAME = "Location"
     private let LOCATOR_URL = URL(string: "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer")!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        mapView.touchDelegate = self
-//
-//        //map = AGSMap(basemap: AGSBasemap.openStreetMap())
-//        map = AGSMap(basemap: AGSBasemap.streetsVector()) //for styling
         
         map = AGSMap(basemap: AGSBasemap.streetsNightVector())
 
@@ -83,18 +77,6 @@ class ViewController: UIViewController {
         // turn off pan/zoom/rotate gestures
         mapView.interactionOptions.isEnabled = false
         
-        /*
-        map.load { [weak self] (error) in
-            guard error == nil else {
-                print("Error occurred when loading map: \(error!.localizedDescription)")
-                return
-            }
-            
-            // zoom to user location -- reading lat, lon from GPX file didn't work correctly
-            // self?.startLocationDisplay()
-        }
-        */
-        
         // work around
         addUserLocation()
         
@@ -113,7 +95,7 @@ class ViewController: UIViewController {
     }
     
     func addUserLocation() {
-        let userLocation = AGSPoint(x: -117.182, y: 34.056, spatialReference: AGSSpatialReference.wgs84())
+        let userLocation = AGSPoint(x: -117.182, y: 34.0564, spatialReference: AGSSpatialReference.wgs84())
         let userLocation_webmercator = AGSGeometryEngine.projectGeometry(userLocation, to: AGSSpatialReference.webMercator()) as! AGSPoint
         let symbol = AGSPictureMarkerSymbol(image: UIImage(named: "person_location")!)
         symbol.height = 30.0
@@ -123,7 +105,13 @@ class ViewController: UIViewController {
         
         mapView.setViewpoint(AGSViewpoint(center: userLocation, scale: 3000))
         
-        getAddress(of: userLocation_webmercator)
+        
+        // get current location address after a delay to allow spoken text to finish
+        unowned let unownedSelf = self
+        let delay = DispatchTime.now() + .seconds(3)
+        DispatchQueue.main.asyncAfter(deadline: delay, execute: {
+            unownedSelf.getAddress(of: userLocation_webmercator)
+        })
     }
     
     func getAddress(of location: AGSPoint) {
@@ -249,53 +237,6 @@ class ViewController: UIViewController {
         let zoom = log(591657550.500000 / (mapScale / 2)) / log(2.0)
         return Int(zoom)
     }
-    
-//    // MARK: touch delegate
-//    func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
-//        guard let currentLocation = mapView.locationDisplay.mapLocation else {
-//            print("no current location")
-//            return
-//        }
-//
-//        print("tapped location: x = \(mapPoint.x), y = \(mapPoint.y)")
-////        routeGraphicsOverlay.graphics.removeAllObjects()
-////        let startStopGraphic = AGSGraphic(geometry: mapPoint, symbol: self.stopSymbol(withName: "Tapped", textColor: .green), attributes: nil)
-////        routeGraphicsOverlay.graphics.add(startStopGraphic)
-//
-//        route(currentLocation, endLocation: mapPoint)
-//    }
-    
-    // reading data from GPX file: https://stackoverflow.com/questions/38507289/swift-how-to-read-coordinates-from-a-gpx-file
-
-    // read data from GPX file
-    // not used
-    // reason - location data from GPX file did not work for simulation
-    
-    func readDataFromFile() {
-        let filePath = getFilePath(fileName: GPX_FILE_NAME)
-        guard filePath != nil else {
-            print ("File \"\(GPX_FILE_NAME).gpx\" does not exist in the project.")
-            return
-        }
-        
-        // setup the parser and initialize it with the filepath's data
-        let data = NSData(contentsOfFile: filePath!)
-        let parser = XMLParser(data: data! as Data)
-        parser.delegate = self
-        
-        // parse the data, here the file will be read
-        let success = parser.parse()
-        
-        // log an error if the parsing failed
-        if !success {
-            print ("Failed to parse the following file: \(GPX_FILE_NAME).gpx")
-        }
-    }
-    
-    func getFilePath(fileName: String) -> String? {
-        // generate a computer readable path
-        return Bundle.main.path(forResource: fileName, ofType: "gpx")
-    }
 
     // MARK: UI Actions
     
@@ -316,7 +257,6 @@ class ViewController: UIViewController {
             let zoomLevel = self?.getZoomLevel(of: currentViewpoint.targetScale)
             UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "Zoom \(zoomLevel!)")
         }
-//        mapView.setViewpoint(viewpoint, duration: 1.5, completion: nil)
     }
     
     @IBAction func zoomIn(_ sender: Any) {
@@ -336,24 +276,10 @@ class ViewController: UIViewController {
             let zoomLevel = self?.getZoomLevel(of: currentViewpoint.targetScale)
             UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "Zoom \(zoomLevel!)")
         }
-//        mapView.setViewpoint(viewpoint, duration: 1.5, completion: nil)
     }
 }
 
-extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCalloutDelegate {
-    
-    // MARK: - XMLParserDelegate
-    
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        // only check for the lines that have a <trkpt> or <wpt> tag. The other lines don't have coordinates and thus don't interest us
-        if elementName == "trkpt" || elementName == "wpt" {
-            // create map coordinate from the file
-            let x = attributeDict["lon"]!
-            let y = attributeDict["lat"]!
-            
-            print(x, y)
-        }
-    }
+extension ViewController: AGSGeoViewTouchDelegate, AGSCalloutDelegate {
     
     // MARK: Routing
     
@@ -369,11 +295,10 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
             return
         }
         
-        let startStopGraphic = AGSGraphic(geometry: startLocation, symbol: stopSymbol(withName: "Origin", textColor: UIColor.blue), attributes: nil)
-        let endStopGraphic = AGSGraphic(geometry: endLocation, symbol: stopSymbol(withName: "Destination", textColor: UIColor.red), attributes: nil)
+        let destinationGraphic = AGSGraphic(geometry: endLocation, symbol: stopSymbol(), attributes: nil)
         
         stopGraphicsOverlay.graphics.removeAllObjects()
-        stopGraphicsOverlay.graphics.addObjects(from: [startStopGraphic, endStopGraphic])
+        stopGraphicsOverlay.graphics.add(destinationGraphic)
         
         //set parameters to return directions
         parameters.returnDirections = true
@@ -390,6 +315,13 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
         let stop2 = AGSStop(point: endLocation)
         stop2.name = "Destination"
         parameters.setStops([stop1, stop2])
+        
+        // Find the "Walking Distance" travel mode
+        
+        if let travelMode = (routeTask.routeTaskInfo().travelModes.filter { $0.name == "Walking Distance" }).first {
+            parameters.travelMode = travelMode
+            print("using travel mode: \(travelMode.name)")
+        }
         
         routeTask.solveRoute(with: parameters) { [weak self] (routeResult: AGSRouteResult?, error: Error?) -> Void in
             if let error = error {
@@ -408,6 +340,12 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
                 self?.generatedRoute = route
                 let routeGraphic = AGSGraphic(geometry: route.routeGeometry, symbol: self?.routeSymbol(), attributes: nil)
                 self?.routeGraphicsOverlay.graphics.add(routeGraphic)
+                
+                var directions = "Directions to your destination, "
+                for maneuver in route.directionManeuvers {
+                    directions.append(", " + maneuver.directionText)
+                }
+                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, directions)
             }
         }
     }
@@ -427,13 +365,22 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
     
     // method provides a line symbol for the route graphic
     func routeSymbol() -> AGSSimpleLineSymbol {
-        let symbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.yellow, width: 5)
+        let symbol = AGSSimpleLineSymbol(style: .solid, color: .green, width: 5)
         return symbol
     }
     
-    //method provides a text symbol for stop with specified parameters
-    func stopSymbol(withName name:String, textColor:UIColor) -> AGSTextSymbol {
-        return AGSTextSymbol(text: name, color: textColor, size: 20, horizontalAlignment: .center, verticalAlignment: .middle)
+    //method provides a marker symbol for stop
+    func stopSymbol() -> AGSMarkerSymbol {
+        guard let image = UIImage(named: "destination_icon") else {
+            // could not find default image, return simple marker instead
+            return AGSSimpleMarkerSymbol(style: .circle, color: .red, size: 24.0)
+        }
+        let marker = AGSPictureMarkerSymbol(image: image)
+        
+        // offset the marker a bit so the flag pole is on the destination
+        marker.offsetX = image.size.width / 4
+        marker.offsetY = image.size.height / 4
+        return marker
     }
 
     // MARK: - AGSGeoViewTouchDelegate
@@ -479,10 +426,19 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
         // hide the callout
         mapView.callout.dismiss()
         
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "Navigating you to Tartan Restaurant")
+        var spokenString = "Navigating you to "
+        if let title = callout.title {
+            spokenString.append(title)
+        }
+        if let detail = callout.detail {
+            spokenString.append(detail)
+        }
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, spokenString)
         
         view.accessibilityElements = [mapView, zoomInButton, zoomOutButton, mapView.callout, mapView.callout.subviews]
         
+        // because we're not out in Redlands, we're hardcoding the user location
+        // also, because of potential mapView issues with VoiceOver, we're not getting the destination correctly
 //        guard let currentLocation = mapView.locationDisplay.mapLocation,
 //            let destination = (callout.representedObject as? AGSGraphic)?.geometry as? AGSPoint else {
 //            print("no current location")
@@ -492,9 +448,15 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
         let userLocation = AGSPoint(x: -117.182, y: 34.056, spatialReference: AGSSpatialReference.wgs84())
         let selectedGeometry = AGSPoint(x: -13044594.483900, y: 4036478.673700, spatialReference: AGSSpatialReference.webMercator())
 
-
         // add code to start navigation
-        route(userLocation, endLocation: selectedGeometry)
+        // route after a delay to allow previous spokenText to finish
+        
+        unowned let unownedSelf = self
+        let delay = DispatchTime.now() + .seconds(3)
+        DispatchQueue.main.asyncAfter(deadline: delay, execute: {
+            unownedSelf.route(userLocation, endLocation: selectedGeometry)
+            
+        })
     }
 }
 
