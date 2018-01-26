@@ -9,7 +9,7 @@
 import UIKit
 import ArcGIS
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, XMLParserDelegate {
 
     @IBOutlet weak var mapView: AGSMapView!
     
@@ -135,8 +135,8 @@ class ViewController: UIViewController {
         // only check for the lines that have a <trkpt> or <wpt> tag. The other lines don't have coordinates and thus don't interest us
         if elementName == "trkpt" || elementName == "wpt" {
             // create map coordinate from the file
-            let x = attributeDict["x"]!
-            let y = attributeDict["y"]!
+            let x = attributeDict["lon"]!
+            let y = attributeDict["lat"]!
             
             print(x, y)
         }
