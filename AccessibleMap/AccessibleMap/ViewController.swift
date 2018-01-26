@@ -15,6 +15,12 @@ class ViewController: UIViewController {
     @IBOutlet var zoomInButton: UIButton!
     @IBOutlet var zoomOutButton: UIButton!
     
+    var routeTask:AGSRouteTask = AGSRouteTask(url: URL(string: "https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_NorthAmerica")!)
+    var routeParameters:AGSRouteParameters?
+    var generatedRoute:AGSRoute?
+    var stopGraphicsOverlay = AGSGraphicsOverlay()
+    var routeGraphicsOverlay = AGSGraphicsOverlay()
+
     private var map: AGSMap!
     private var featureTable: AGSServiceFeatureTable!
     private var featureLayer: AGSFeatureLayer!
@@ -37,7 +43,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+//        mapView.touchDelegate = self
+//
+//        //map = AGSMap(basemap: AGSBasemap.openStreetMap())
+//        map = AGSMap(basemap: AGSBasemap.streetsVector()) //for styling
+        
         map = AGSMap(basemap: AGSBasemap.streetsNightVector())
+
         mapView.map = map
         
         graphicsOverlayer = AGSGraphicsOverlay()
@@ -85,6 +97,19 @@ class ViewController: UIViewController {
         
         // work around
         addUserLocation()
+        
+        // get default routing parameters
+        routeTask.credential = AGSCredential(user: "user", password: "password")
+        routeTask.load { [weak self] (error) in
+            if let error = error {
+                print(error)
+            }
+            self?.getDefaultParameters()
+        }
+        
+        //add graphicsOverlays to the map view
+        mapView.graphicsOverlays.addObjects(from: [routeGraphicsOverlay, stopGraphicsOverlay])
+
     }
     
     func addUserLocation() {
@@ -135,7 +160,6 @@ class ViewController: UIViewController {
     
     func queryFeatures(around location: AGSPoint, within distance: Double) {
         let area = AGSGeometryEngine.bufferGeometry(location, byDistance: distance)
-        
         let dispatchGroup = DispatchGroup()
         var totalCount = 0
         
@@ -204,6 +228,9 @@ class ViewController: UIViewController {
     // reason - location data from GPX file did not work for simulation
     
     func startLocationDisplay() {
+        let gpxDataSource = AGSGPXLocationDataSource(name: "Location")
+        mapView.locationDisplay.dataSource = gpxDataSource
+        
         mapView.locationDisplay.autoPanMode = .recenter
         mapView.locationDisplay.showPingAnimationSymbol = true
         
@@ -223,6 +250,23 @@ class ViewController: UIViewController {
         return Int(zoom)
     }
     
+//    // MARK: touch delegate
+//    func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
+//        guard let currentLocation = mapView.locationDisplay.mapLocation else {
+//            print("no current location")
+//            return
+//        }
+//
+//        print("tapped location: x = \(mapPoint.x), y = \(mapPoint.y)")
+////        routeGraphicsOverlay.graphics.removeAllObjects()
+////        let startStopGraphic = AGSGraphic(geometry: mapPoint, symbol: self.stopSymbol(withName: "Tapped", textColor: .green), attributes: nil)
+////        routeGraphicsOverlay.graphics.add(startStopGraphic)
+//
+//        route(currentLocation, endLocation: mapPoint)
+//    }
+    
+    // reading data from GPX file: https://stackoverflow.com/questions/38507289/swift-how-to-read-coordinates-from-a-gpx-file
+
     // read data from GPX file
     // not used
     // reason - location data from GPX file did not work for simulation
@@ -252,7 +296,7 @@ class ViewController: UIViewController {
         // generate a computer readable path
         return Bundle.main.path(forResource: fileName, ofType: "gpx")
     }
-    
+
     // MARK: UI Actions
     
     @IBAction func zoomOut(_ sender: Any) {
@@ -311,6 +355,87 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
         }
     }
     
+    // MARK: Routing
+    
+    //
+    // route - handles routing from a starting location to an ending location
+    // will display the route on the map
+    // will speak the text directions when the routing completes
+    //
+    func route(_ startLocation: AGSPoint, endLocation: AGSPoint) {
+        //route only if default parameters are fetched successfully
+        guard let parameters = routeParameters else {
+            print("Default route parameters not loaded")
+            return
+        }
+        
+        let startStopGraphic = AGSGraphic(geometry: startLocation, symbol: stopSymbol(withName: "Origin", textColor: UIColor.blue), attributes: nil)
+        let endStopGraphic = AGSGraphic(geometry: endLocation, symbol: stopSymbol(withName: "Destination", textColor: UIColor.red), attributes: nil)
+        
+        stopGraphicsOverlay.graphics.removeAllObjects()
+        stopGraphicsOverlay.graphics.addObjects(from: [startStopGraphic, endStopGraphic])
+        
+        //set parameters to return directions
+        parameters.returnDirections = true
+        
+        //clear previous routes
+        routeGraphicsOverlay.graphics.removeAllObjects()
+        
+        //clear previous stops
+        parameters.clearStops()
+        
+        //set the stops
+        let stop1 = AGSStop(point: startLocation)
+        stop1.name = "Origin"
+        let stop2 = AGSStop(point: endLocation)
+        stop2.name = "Destination"
+        parameters.setStops([stop1, stop2])
+        
+        routeTask.solveRoute(with: parameters) { [weak self] (routeResult: AGSRouteResult?, error: Error?) -> Void in
+            if let error = error {
+                print(error)
+            }
+            else {
+                //show the resulting route on the map
+                //also save a reference to the route object
+                //in order to access directions
+                guard let route = routeResult?.routes.first else {
+                    print("No route")
+                    return
+                }
+                
+                print("routed completed, no error")
+                self?.generatedRoute = route
+                let routeGraphic = AGSGraphic(geometry: route.routeGeometry, symbol: self?.routeSymbol(), attributes: nil)
+                self?.routeGraphicsOverlay.graphics.add(routeGraphic)
+            }
+        }
+    }
+    
+    //method to get the default parameters for the route task
+    func getDefaultParameters() {
+        routeTask.defaultRouteParameters { [weak self] (params: AGSRouteParameters?, error: Error?) -> Void in
+            if let error = error {
+                print(error)
+            }
+            else {
+                //on completion store the parameters
+                self?.routeParameters = params
+            }
+        }
+    }
+    
+    // method provides a line symbol for the route graphic
+    func routeSymbol() -> AGSSimpleLineSymbol {
+        let symbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.yellow, width: 5)
+        return symbol
+    }
+    
+    //method provides a text symbol for stop with specified parameters
+    func stopSymbol(withName name:String, textColor:UIColor) -> AGSTextSymbol {
+        return AGSTextSymbol(text: name, color: textColor, size: 20, horizontalAlignment: .center, verticalAlignment: .middle)
+    }
+
     // MARK: - AGSGeoViewTouchDelegate
     
     func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
@@ -357,8 +482,19 @@ extension ViewController: XMLParserDelegate, AGSGeoViewTouchDelegate, AGSCallout
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "Navigating you to Tartan Restaurant")
         
         view.accessibilityElements = [mapView, zoomInButton, zoomOutButton, mapView.callout, mapView.callout.subviews]
-        // add code to start navigation
-    }
+        
+//        guard let currentLocation = mapView.locationDisplay.mapLocation,
+//            let destination = (callout.representedObject as? AGSGraphic)?.geometry as? AGSPoint else {
+//            print("no current location")
+//            return
+//        }
+        
+        let userLocation = AGSPoint(x: -117.182, y: 34.056, spatialReference: AGSSpatialReference.wgs84())
+        let selectedGeometry = AGSPoint(x: -13044594.483900, y: 4036478.673700, spatialReference: AGSSpatialReference.webMercator())
 
+
+        // add code to start navigation
+        route(userLocation, endLocation: selectedGeometry)
+    }
 }
 

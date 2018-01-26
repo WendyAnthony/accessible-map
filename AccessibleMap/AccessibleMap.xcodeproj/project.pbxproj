@@ -311,7 +311,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 68XNCB6KYT;
+				DEVELOPMENT_TEAM = GYGAMK78V4;
 				FRAMEWORK_SEARCH_PATHS = "$(HOME)/Library/SDKs/ArcGIS/iOS/Frameworks/Static";
 				INFOPLIST_FILE = AccessibleMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -323,7 +323,7 @@
 					"-l",
 					"c++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.garima;
+				PRODUCT_BUNDLE_IDENTIFIER = com.accesibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -335,7 +335,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 68XNCB6KYT;
+				DEVELOPMENT_TEAM = GYGAMK78V4;
 				FRAMEWORK_SEARCH_PATHS = "$(HOME)/Library/SDKs/ArcGIS/iOS/Frameworks/Static";
 				INFOPLIST_FILE = AccessibleMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -347,7 +347,7 @@
 					"-l",
 					"c++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.garima;
+				PRODUCT_BUNDLE_IDENTIFIER = com.accesibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
